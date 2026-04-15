@@ -5,6 +5,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Properties;
 import java.util.Scanner;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ChatMIstraApplication {
     public static void main(String[] args) {
@@ -40,7 +41,7 @@ public class ChatMIstraApplication {
         // 🗣️ Comienza el chat
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            System.out.print("\nTú: ");
+            System.out.print("\nMe: ");
             String prompt = scanner.nextLine();
             if (prompt.equalsIgnoreCase("quit")) break;
 
@@ -66,15 +67,20 @@ public class ChatMIstraApplication {
                 }
                 in.close();
 
-                // Mostrar la JSon de respuesta
-                System.out.println("🤖 Mistral: " + response.toString());
+                //Show entire answer in JSON format
+                System.out.println("Mistral complete-answer: " + response.toString());
+                //Show only the content of the answer
+                ObjectMapper mapper = new ObjectMapper();
+                com.fasterxml.jackson.databind.JsonNode rootNode = mapper.readTree(response.toString());
+                String content = rootNode.path("choices").get(0).path("message").path("content").asText();
+                System.out.println("Mistral: " + content);
 
             } catch (Exception e) {
-                System.err.println("Error al comunicarse con la API: " + e.getMessage());
+                System.err.println("Error with API communication: " + e.getMessage());
             }
         }
 
-        System.out.println("Chat Terminado.");
+        System.out.println("Chat is finished.");
     }
 
 }
